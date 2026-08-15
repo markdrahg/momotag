@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://markdrahg.github.io/momotag/sitemap.xml

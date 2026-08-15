@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Primary SEO -->
+<title>MoMoTag — A Privacy-Preserving Alias System for Mobile Money | Mark Drah</title>
+<meta name="description" content="MoMoTag is a proposal by Mark Drah to stop mobile money apps from leaking full legal names through fake or cancelled transfers, replacing them with a persistent privacy alias.">
+<meta name="keywords" content="MoMoTag, mobile money privacy, mobile money security, MoMo alias, KYC privacy, telecom cybersecurity proposal, mobile money fraud prevention, Mark Drah, cybersecurity educator, backend engineer Ghana, mobile money name leak, fintech privacy Africa">
+<meta name="author" content="Mark Drah">
+<link rel="canonical" href="https://markdrahg.github.io/momotag/">
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" href="favicon.png">
+
+<!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://markdrahg.github.io/momotag/">
+<meta property="og:title" content="MoMoTag — Your real name shouldn't leak from a cancelled transfer">
+<meta property="og:description" content="A privacy-preserving alias system for mobile money transactions — proposed by Mark Drah, Backend Engineer & Cybersecurity Educator.">
+<meta property="og:image" content="https://markdrahg.github.io/momotag/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="MoMoTag">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter / X Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://markdrahg.github.io/momotag/">
+<meta name="twitter:title" content="MoMoTag — Your real name shouldn't leak from a cancelled transfer">
+<meta name="twitter:description" content="A privacy-preserving alias system for mobile money transactions — proposed by Mark Drah, Backend Engineer & Cybersecurity Educator.">
+<meta name="twitter:image" content="https://markdrahg.github.io/momotag/og-image.png">
+
+<!-- Structured data: ties this page + topic to Mark Drah as author -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "MoMoTag — A Privacy-Preserving Alias System for Mobile Money Transactions",
+  "description": "A proposal to replace full legal names shown on mobile money transaction-confirmation screens with a persistent, non-identifying alias, closing a passive name-harvesting privacy leak.",
+  "url": "https://markdrahg.github.io/momotag/",
+  "datePublished": "2026-08-01",
+  "image": "https://markdrahg.github.io/momotag/og-image.png",
+  "author": {
+    "@type": "Person",
+    "name": "Mark Drah",
+    "jobTitle": "Backend Engineer & Cybersecurity Educator",
+    "url": "https://www.linkedin.com/in/markdrah",
+    "sameAs": [
+      "https://www.linkedin.com/in/markdrah"
+    ]
+  },
+  "publisher": {
+    "@type": "Person",
+    "name": "Mark Drah"
+  },
+  "keywords": "mobile money privacy, MoMoTag, KYC alias, telecom cybersecurity, fintech privacy Africa"
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FCFCFA;
+    --ink:#16232E;
+    --accent:#0F6B5C;
+    --accent-dark:#0B4F44;
+    --danger:#A6402B;
+    --surface:#EEF3EF;
+    --surface-2:#F5F7F4;
+    --line:#DBE3DD;
+    --muted:#5B6B63;
+    --white:#FFFFFF;
+    --radius:14px;
+    --maxw:1080px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    line-height:1.12;
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  p{margin:0;}
+  a{color:inherit;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 28px;}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    font-weight:600;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--accent-dark);
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .eyebrow::before{
+    content:"";
+    width:22px; height:1px;
+    background:var(--accent);
+    display:inline-block;
+  }
+
+  /* NAV */
+  nav{
+    position:sticky; top:0; z-index:50;
+    background:rgba(252,252,250,0.86);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  nav .wrap{
+    display:flex; align-items:center; justify-content:space-between;
+    padding-top:16px; padding-bottom:16px;
+  }
+  .brand{
+    display:flex; align-items:center; gap:9px;
+    font-family:'Fraunces',serif; font-weight:600; font-size:19px;
+    text-decoration:none; color:var(--ink);
+  }
+  .brand .mark{
+    width:26px; height:26px; border-radius:7px;
+    background:var(--accent);
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600;
+  }
+  .navlinks{display:flex; gap:28px; font-size:14.5px; font-weight:500;}
+  .navlinks a{text-decoration:none; color:var(--muted); transition:color .15s;}
+  .navlinks a:hover{color:var(--accent-dark);}
+  .navlinks{display:none;}
+  @media(min-width:820px){.navlinks{display:flex;}}
+
+  section{padding:96px 0;}
+  section.tight{padding:72px 0;}
+  .divider{border:none; border-top:1px solid var(--line); margin:0;}
+
+  /* HERO */
+  .hero{padding:76px 0 88px;}
+  .hero-grid{
+    display:grid; grid-template-columns:1fr; gap:52px; align-items:center;
+  }
+  @media(min-width:900px){.hero-grid{grid-template-columns:1.05fr 0.95fr;}}
+  .hero h1{font-size:44px; margin-top:18px;}
+  @media(min-width:640px){.hero h1{font-size:56px;}}
+  .hero h1 em{font-style:normal; color:var(--accent);}
+  .hero p.lede{
+    margin-top:20px; font-size:18px; color:var(--muted); max-width:46ch;
+  }
+  .cta-row{display:flex; gap:14px; margin-top:32px; flex-wrap:wrap;}
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:13px 22px; border-radius:999px; font-size:14.5px; font-weight:600;
+    text-decoration:none; border:1px solid transparent; cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:hover{transform:translateY(-1px);}
+  .btn-primary{background:var(--ink); color:#fff;}
+  .btn-primary:hover{box-shadow:0 8px 20px rgba(22,35,46,0.22);}
+  .btn-ghost{background:transparent; color:var(--ink); border-color:var(--line);}
+  .btn-ghost:hover{border-color:var(--ink);}
+
+  /* Phone demo */
+  .demo-card{
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:20px; padding:28px;
+  }
+  .demo-toggle{
+    display:flex; align-items:center; justify-content:center; gap:12px;
+    margin-bottom:22px;
+  }
+  .toggle-label{font-size:13px; font-weight:600; color:var(--muted); transition:color .2s;}
+  .toggle-label.active{color:var(--ink);}
+  .switch{
+    position:relative; width:52px; height:28px; border-radius:999px;
+    background:var(--danger); cursor:pointer; border:none; padding:0;
+    transition:background .25s ease; flex-shrink:0;
+  }
+  .switch.on{background:var(--accent);}
+  .switch .knob{
+    position:absolute; top:3px; left:3px; width:22px; height:22px; border-radius:50%;
+    background:#fff; transition:left .25s ease; box-shadow:0 1px 3px rgba(0,0,0,0.25);
+  }
+  .switch.on .knob{left:27px;}
+
+  .phone{
+    width:250px; margin:0 auto; background:#182028; border-radius:32px; padding:10px;
+    box-shadow:0 20px 40px rgba(15,25,20,0.16);
+  }
+  .phone-screen{background:#fff; border-radius:22px; overflow:hidden;}
+  .phone-status{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:10px 16px 6px; font-size:11px; color:#8a8f94; font-family:'IBM Plex Mono',monospace;
+  }
+  .phone-header{
+    padding:14px 16px; text-align:center; font-weight:600; font-size:14px; color:#fff;
+    background:var(--danger); transition:background .25s ease;
+  }
+  .phone-header.on{background:var(--accent);}
+  .phone-body{padding:18px 16px 22px;}
+  .field-label{font-size:11.5px; color:#8a8f94; margin-bottom:4px;}
+  .field-value{font-size:14px; color:var(--ink); margin-bottom:16px;}
+  .name-box{
+    border-radius:9px; padding:12px 14px; margin-bottom:16px;
+    background:#FBE9E6; transition:background .25s ease;
+  }
+  .name-box.on{background:#E4F1EA;}
+  .name-box .value{
+    font-size:17px; font-weight:700; color:var(--danger); transition:color .25s ease;
+    font-family:'IBM Plex Mono',monospace;
+  }
+  .name-box.on .value{color:var(--accent-dark);}
+  .confirm-btn{
+    margin-top:6px; text-align:center; padding:11px; border-radius:9px;
+    background:var(--danger); color:#fff; font-size:12.5px; font-weight:700;
+    letter-spacing:0.03em; transition:background .25s ease;
+  }
+  .confirm-btn.on{background:var(--accent);}
+  .demo-caption{
+    text-align:center; margin-top:16px; font-size:13px; color:var(--muted);
+  }
+  .demo-caption b{color:var(--ink);}
+
+  /* PROBLEM */
+  .problem-steps{
+    display:grid; grid-template-columns:1fr; gap:0; margin-top:44px;
+  }
+  .pstep{
+    position:relative; padding:0 0 40px 34px; border-left:2px solid var(--line); margin-left:6px;
+  }
+  .pstep:last-child{border-left:2px solid transparent; padding-bottom:0;}
+  .pstep::before{
+    content:attr(data-n);
+    position:absolute; left:-19px; top:0;
+    width:36px; height:36px; border-radius:50%;
+    background:var(--ink); color:#fff;
+    font-family:'IBM Plex Mono',monospace; font-size:13px; font-weight:600;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .pstep h4{font-family:'Inter',sans-serif; font-size:16.5px; font-weight:700; margin-bottom:6px;}
+  .pstep p{color:var(--muted); font-size:15px; max-width:60ch;}
+
+  .stat-box{
+    margin-top:48px; background:var(--surface); border:1px solid var(--line);
+    border-radius:var(--radius); padding:26px 28px;
+  }
+  .stat-box .stat-title{font-weight:700; margin-bottom:10px; font-size:15px;}
+  .stat-box ul{margin:0; padding-left:18px; color:var(--muted); font-size:14.5px;}
+  .stat-box li{margin-bottom:6px;}
+
+  /* SOLUTION */
+  .before-after{
+    display:grid; grid-template-columns:1fr; gap:0; margin-top:40px;
+    border:1px solid var(--line); border-radius:var(--radius); overflow:hidden;
+  }
+  @media(min-width:720px){.before-after{grid-template-columns:1fr 1fr;}}
+  .ba-col{padding:22px 26px;}
+  .ba-col.before{background:#FBF1EF; border-bottom:1px solid var(--line);}
+  .ba-col.after{background:#EEF6F1;}
+  @media(min-width:720px){
+    .ba-col.before{border-bottom:none; border-right:1px solid var(--line);}
+  }
+  .ba-tag{font-family:'IBM Plex Mono',monospace; font-size:11.5px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;}
+  .ba-col.before .ba-tag{color:var(--danger);}
+  .ba-col.after .ba-tag{color:var(--accent-dark);}
+  .ba-line{font-family:'IBM Plex Mono',monospace; font-size:15px; margin-top:12px; color:var(--ink);}
+
+  .tier-grid{display:grid; grid-template-columns:1fr; gap:18px; margin-top:36px;}
+  @media(min-width:720px){.tier-grid{grid-template-columns:1fr 1fr;}}
+  .tier-card{
+    border:1px solid var(--line); border-radius:var(--radius); padding:26px;
+    background:var(--white);
+  }
+  .tier-card .tier-eyebrow{
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; font-weight:700;
+    color:var(--accent-dark); text-transform:uppercase; letter-spacing:0.08em;
+  }
+  .tier-card h4{font-family:'Fraunces',serif; font-size:20px; margin-top:8px; font-weight:600;}
+  .tier-card p{margin-top:10px; color:var(--muted); font-size:14.5px;}
+
+  /* HOW IT WORKS */
+  .flow{
+    display:grid; grid-template-columns:1fr; gap:22px; margin-top:44px;
+  }
+  @media(min-width:820px){.flow{grid-template-columns:repeat(4,1fr);}}
+  .flow-step{position:relative; padding-top:8px;}
+  .flow-num{
+    width:38px; height:38px; border-radius:50%; background:var(--ink); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono',monospace; font-size:14px; font-weight:600;
+    margin-bottom:16px;
+  }
+  .flow-step h4{font-family:'Inter',sans-serif; font-size:15.5px; font-weight:700; margin-bottom:6px;}
+  .flow-step p{font-size:14px; color:var(--muted);}
+  @media(min-width:820px){
+    .flow-step:not(:last-child)::after{
+      content:""; position:absolute; top:19px; left:100%; width:22px; height:2px;
+      background:var(--line);
+    }
+  }
+
+  .trust-box{
+    margin-top:48px; padding:26px 28px; border-radius:var(--radius);
+    background:var(--surface-2); border:1px solid var(--line);
+  }
+  .trust-box p{font-size:15px; color:var(--ink); max-width:70ch;}
+  .trust-box p + p{margin-top:10px; color:var(--muted); font-size:14.5px;}
+
+  /* LAYER DIAGRAM */
+  .layer-diagram{margin-top:44px; display:flex; flex-direction:column; align-items:center; gap:0;}
+  .layer-box{
+    width:100%; max-width:640px; border-radius:12px; padding:22px 26px; text-align:center;
+  }
+  .layer-box.display{
+    border:2px dashed var(--danger); background:#fff;
+  }
+  .layer-box.display .lb-title{color:var(--danger);}
+  .layer-box.data{
+    background:var(--surface); border:2px solid var(--accent-dark); margin-top:34px;
+  }
+  .layer-box.data .lb-title{color:var(--accent-dark);}
+  .lb-title{font-weight:700; font-size:15px; margin-bottom:8px;}
+  .lb-desc{font-size:13.5px; color:var(--muted);}
+  .layer-arrow{
+    width:2px; height:26px; background:var(--line); position:relative; margin-top:0;
+  }
+
+  .reassure-grid{
+    display:grid; grid-template-columns:1fr; gap:14px; margin-top:36px;
+  }
+  @media(min-width:720px){.reassure-grid{grid-template-columns:1fr 1fr;}}
+  .reassure-item{
+    display:flex; gap:12px; align-items:flex-start;
+    padding:16px 18px; border:1px solid var(--line); border-radius:11px; background:var(--white);
+  }
+  .reassure-item .dot{
+    width:8px; height:8px; border-radius:50%; background:var(--accent); margin-top:7px; flex-shrink:0;
+  }
+  .reassure-item p{font-size:14.5px; color:var(--ink);}
+
+  /* SCOPE */
+  .scope-grid{display:grid; grid-template-columns:1fr; gap:18px; margin-top:40px;}
+  @media(min-width:720px){.scope-grid{grid-template-columns:1fr 1fr;}}
+  .scope-card{border-radius:var(--radius); padding:26px 28px; border:1px solid var(--line);}
+  .scope-card.solves{background:#EEF6F1;}
+  .scope-card.not{background:#F5F5F3;}
+  .scope-card .sc-title{font-weight:700; font-size:15px; margin-bottom:10px;}
+  .scope-card.solves .sc-title{color:var(--accent-dark);}
+  .scope-card.not .sc-title{color:var(--muted);}
+  .scope-card p{font-size:14.5px; color:var(--ink); line-height:1.65;}
+
+  /* ADVANTAGES */
+  .adv-grid{
+    display:grid; grid-template-columns:1fr; gap:18px; margin-top:44px;
+  }
+  @media(min-width:640px){.adv-grid{grid-template-columns:1fr 1fr;}}
+  @media(min-width:980px){.adv-grid{grid-template-columns:repeat(3,1fr);}}
+  .adv-card{
+    padding:24px; border:1px solid var(--line); border-radius:var(--radius); background:var(--white);
+  }
+  .adv-card .adv-icon{
+    width:36px; height:36px; border-radius:9px; background:var(--surface);
+    display:flex; align-items:center; justify-content:center; margin-bottom:14px;
+    color:var(--accent-dark); font-weight:700; font-family:'IBM Plex Mono',monospace; font-size:13px;
+  }
+  .adv-card h4{font-family:'Inter',sans-serif; font-size:15.5px; font-weight:700; margin-bottom:8px;}
+  .adv-card p{font-size:14px; color:var(--muted);}
+
+  /* CLOSING */
+  .closing{
+    background:var(--ink); color:#fff; border-radius:22px; padding:56px 40px; margin:0 auto;
+    text-align:center;
+  }
+  .closing h2{color:#fff; font-size:32px;}
+  @media(min-width:640px){.closing h2{font-size:38px;}}
+  .closing p{color:#B8C4C0; margin-top:14px; max-width:56ch; margin-left:auto; margin-right:auto; font-size:15.5px;}
+  .closing .cta-row{justify-content:center;}
+  .closing .btn-primary{background:#fff; color:var(--ink);}
+  .closing .btn-ghost{border-color:#3A4750; color:#fff;}
+  .closing .btn-ghost:hover{border-color:#fff;}
+
+  footer{padding:44px 0 60px;}
+  .footer-grid{
+    display:flex; flex-direction:column; gap:18px; align-items:center; text-align:center;
+  }
+  @media(min-width:720px){.footer-grid{flex-direction:row; justify-content:space-between; text-align:left;}}
+  .footer-author{font-size:14px;}
+  .footer-author b{font-family:'Fraunces',serif; font-weight:600; font-size:16px;}
+  .footer-author .role{color:var(--muted); font-size:13px; display:block; margin-top:2px;}
+  .footer-links{display:flex; gap:20px; font-size:13.5px;}
+  .footer-links a{text-decoration:none; color:var(--muted); border-bottom:1px solid transparent; transition:border-color .15s, color .15s;}
+  .footer-links a:hover{color:var(--accent-dark); border-color:var(--accent-dark);}
+
+  .section-head{max-width:64ch;}
+  .section-head h2{font-size:32px; margin-top:14px;}
+  @media(min-width:640px){.section-head h2{font-size:38px;}}
+  .section-head p.sub{margin-top:16px; font-size:16px; color:var(--muted);}
+
+  ::selection{background:#CFE7DD;}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="#top" class="brand"><span class="mark"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.59 2.59a2 2 0 0 0-1.42-.59H4a2 2 0 0 0-2 2v7.17a2 2 0 0 0 .59 1.41l8.83 8.83a2 2 0 0 0 2.83 0l7.17-7.17a2 2 0 0 0 0-2.83z"/><circle cx="7.5" cy="7.5" r="1.5" fill="white" stroke="none"/></svg></span>MoMoTag</a>
+    <div class="navlinks">
+      <a href="#problem">Problem</a>
+      <a href="#solution">Solution</a>
+      <a href="#how">How it works</a>
+      <a href="#scope">Scope</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <a href="#contact" class="btn btn-ghost" style="padding:9px 18px; font-size:13.5px;">Get in touch</a>
+  </div>
+</nav>
+
+<header id="top" class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">A CONCEPTUAL PROPOSAL &middot; MOBILE MONEY PRIVACY</div>
+      <h1>Your real name shouldn't leak from a <em>cancelled</em> transfer.</h1>
+      <p class="lede">MoMoTag replaces the full legal name shown on mobile money confirmation screens with a persistent alias — closing a quiet privacy leak that today costs an attacker nothing to exploit.</p>
+      <div class="cta-row">
+        <a href="#problem" class="btn btn-primary">See the problem →</a>
+        <a href="MoMoTag_Proposal.pdf" id="download-btn" class="btn btn-ghost" download>Download the full proposal (.docx)</a>
+      </div>
+    </div>
+    <div class="demo-card">
+      <div class="demo-toggle">
+        <span class="toggle-label active" id="label-today">Today</span>
+        <button class="switch" id="demoSwitch" aria-label="Toggle MoMoTag demo"><span class="knob"></span></button>
+        <span class="toggle-label" id="label-tag">With MoMoTag</span>
+      </div>
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="phone-status"><span>9:41</span><span>●●●</span></div>
+          <div class="phone-header" id="phoneHeader">Send Money</div>
+          <div class="phone-body">
+            <div class="field-label">Sending to</div>
+            <div class="field-value mono">024 4XX XX12</div>
+            <div class="field-label" id="fieldLabel">Recipient name</div>
+            <div class="name-box" id="nameBox"><div class="value" id="nameValue">Mark Drah</div></div>
+            <div class="field-label">Amount</div>
+            <div class="field-value mono">GHS 50.00</div>
+            <div class="confirm-btn" id="confirmBtn">CONFIRM TRANSFER</div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-caption" id="demoCaption">A stranger can start (and cancel) this transfer with only your phone number — and walk away with <b>your full legal name</b>.</div>
+    </div>
+  </div>
+</header>
+
+<hr class="divider">
+
+<section id="problem">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">The Problem</div>
+      <h2>A four-step leak, hiding in plain sight.</h2>
+      <p class="sub">Most mobile money systems display a recipient's full registered name during transfer confirmation — even when the transfer is never completed. Almost no one treats this as an attack surface.</p>
+    </div>
+
+    <div class="problem-steps">
+      <div class="pstep" data-n="1">
+        <h4>Probe</h4>
+        <p>A stranger, knowing only your phone number, opens a mobile money app and starts a transfer to you. No money needs to be sent.</p>
+      </div>
+      <div class="pstep" data-n="2">
+        <h4>Disclose</h4>
+        <p>Before confirming, the app displays your full registered name for the sender to verify — standard "confirm recipient" behaviour in most MoMo systems.</p>
+      </div>
+      <div class="pstep" data-n="3">
+        <h4>Capture</h4>
+        <p>The stranger notes or screenshots your name, then cancels the transfer. Nothing was sent, nothing was logged as suspicious, and you were never notified.</p>
+      </div>
+      <div class="pstep" data-n="4">
+        <h4>Exploit</h4>
+        <p>Your real name — now confirmed and tied to your phone number — can be used to impersonate you, fabricate claims in your name, or run targeted scams on people who know you.</p>
+      </div>
+    </div>
+
+    <div class="stat-box">
+      <div class="stat-title">Why this matters</div>
+      <ul>
+        <li>The harvesting step costs the attacker nothing and leaves no record of malicious intent — a cancelled transaction looks identical to a genuine mistake.</li>
+        <li>It can be automated: sequential phone numbers can be probed to build a database of real names at scale.</li>
+        <li>Awareness is extremely low — roughly <b>1 in 100</b> users has likely ever considered this as an attack surface.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="solution">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">The Solution</div>
+      <h2>Introducing MoMoTag.</h2>
+      <p class="sub">A persistent, non-identifying alias stands in for a user's full legal name at the transaction-confirmation layer. The legal name never leaves the system — it just stops being shown to an unrelated sender.</p>
+    </div>
+
+    <div class="before-after">
+      <div class="ba-col before">
+        <div class="ba-tag">Today</div>
+        <div class="ba-line">"Confirm transfer of GHS 50 to <b>Mark Drah</b>?"</div>
+      </div>
+      <div class="ba-col after">
+        <div class="ba-tag">With MoMoTag</div>
+        <div class="ba-line">"Confirm transfer of GHS 50 to <b>MD-4471</b>?"</div>
+      </div>
+    </div>
+
+    <div class="tier-grid">
+      <div class="tier-card">
+        <div class="tier-eyebrow">Tier 1 · Default</div>
+        <h4>Automatic, for everyone</h4>
+        <p>Every user is assigned a system-generated alias at registration — no action required. This guarantees baseline privacy by default, not just for the privacy-conscious.</p>
+      </div>
+      <div class="tier-card">
+        <div class="tier-eyebrow">Tier 2 · Optional</div>
+        <h4>Customizable, for recognisability</h4>
+        <p>Users may personalise the readable portion of their alias (e.g. "MARKD"). The numeric suffix stays system-enforced to guarantee uniqueness — with a change-frequency limit to prevent abuse.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="how">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">How It Works</div>
+      <h2>Four steps, start to finish.</h2>
+      <p class="sub">The alias is bound to a person's verified identity — not their SIM — so it persists across phone changes and never breaks a contact who already trusts it.</p>
+    </div>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <h4>Registration</h4>
+        <p>KYC completed as usual; the system auto-generates a unique alias alongside it.</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <h4>Confirmation</h4>
+        <p>Senders see the alias only — the legal name is never shown to an unrelated party.</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <h4>Identity binding</h4>
+        <p>The alias is tied to verified identity, not SIM — it survives phone and number changes.</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <h4>Trusted contact</h4>
+        <p>After a successful transaction, the alias is saved — repeat transfers are verified by history.</p>
+      </div>
+    </div>
+
+    <div class="trust-box">
+      <p>MoMoTag deliberately does not attempt to solve first-contact identity verification — a broader problem that today's full-name display doesn't fully solve either.</p>
+      <p>Instead, it targets one specific problem well: passive, automated, no-consent name harvesting.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="unchanged">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">What Doesn't Change</div>
+      <h2>A display-layer fix, not a data-layer one.</h2>
+      <p class="sub">MoMoTag changes what an unrelated sender sees on a confirmation screen. It does not touch what's stored, what regulators can access, or what law enforcement can investigate.</p>
+    </div>
+
+    <div class="layer-diagram">
+      <div class="layer-box display">
+        <div class="lb-title">Display layer — this is what MoMoTag changes</div>
+        <div class="lb-desc">What an unrelated sender sees during a transfer-confirmation screen: real name → persistent alias</div>
+      </div>
+      <div class="layer-arrow"></div>
+      <div class="layer-box data">
+        <div class="lb-title">Data layer — untouched</div>
+        <div class="lb-desc">Full legal name · KYC records · Compliance access · Law-enforcement access</div>
+      </div>
+    </div>
+
+    <div class="reassure-grid">
+      <div class="reassure-item"><span class="dot"></span><p>Full legal names remain stored and tied to verified KYC records, exactly as regulation requires today.</p></div>
+      <div class="reassure-item"><span class="dot"></span><p>Account holders can always view their own real name and alias pairing.</p></div>
+      <div class="reassure-item"><span class="dot"></span><p>Telecom compliance and fraud-detection systems retain full access to real identity data.</p></div>
+      <div class="reassure-item"><span class="dot"></span><p>Law enforcement retains access to real identity data through proper legal process.</p></div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="scope">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Scope &amp; Honesty</div>
+      <h2>What this proposal claims — and doesn't.</h2>
+      <p class="sub">A proposal is more credible when it's honest about its edges. Here's exactly what MoMoTag is solving, and what it deliberately leaves open.</p>
+    </div>
+
+    <div class="scope-grid">
+      <div class="scope-card solves">
+        <div class="sc-title">What MoMoTag solves</div>
+        <p>Passive, automated, no-consent harvesting of real names via fake or cancelled transfer attempts — at zero cost and zero trace to the attacker.</p>
+      </div>
+      <div class="scope-card not">
+        <div class="sc-title">What it doesn't claim to solve</div>
+        <p>First-contact identity verification — confirming with certainty that an alias belongs to the person a sender intends to pay, before any transaction history exists. This limitation already exists in today's full-name systems too.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="advantages">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Advantages</div>
+      <h2>Why this is worth building.</h2>
+    </div>
+
+    <div class="adv-grid">
+      <div class="adv-card">
+        <div class="adv-icon">01</div>
+        <h4>Privacy by default</h4>
+        <p>Every user gains protection automatically — no opt-in, no need to understand the risk first.</p>
+      </div>
+      <div class="adv-card">
+        <div class="adv-icon">02</div>
+        <h4>Harder to scrape</h4>
+        <p>Removes the ability to cheaply script large-scale collection of real names tied to phone numbers.</p>
+      </div>
+      <div class="adv-card">
+        <div class="adv-icon">03</div>
+        <h4>Regulator-friendly</h4>
+        <p>No change to KYC, AML, or law-enforcement access — a far easier path to real-world adoption.</p>
+      </div>
+      <div class="adv-card">
+        <div class="adv-icon">04</div>
+        <h4>Portable identity</h4>
+        <p>Alias binding to KYC identity, not SIM, means protection survives SIM swaps and number changes.</p>
+      </div>
+      <div class="adv-card">
+        <div class="adv-icon">05</div>
+        <h4>Built-in branding</h4>
+        <p>Tier 2 customization lets merchants use a recognisable, trustworthy alias instead of a random code.</p>
+      </div>
+      <div class="adv-card">
+        <div class="adv-icon">06</div>
+        <h4>Low friction</h4>
+        <p>Senders still confirm recipients before paying — the flow barely changes, only what's displayed does.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap">
+    <div class="closing">
+      <div class="eyebrow" style="justify-content:center; color:#8FD9C2;">Open for discussion</div>
+      <h2 style="margin-top:16px;">This is an early-stage proposal.<br>Scrutiny welcome.</h2>
+      <p>Feedback from telecom operators, security researchers, regulators, and everyday mobile money users helps shape where this goes next.</p>
+      <div class="cta-row">
+        <a href="mailto:neutral520@gmail.com" class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z" stroke="none"/><path d="M3 6.5 12 13l9-6.5"/><rect x="3" y="5" width="18" height="14" rx="2"/></svg>
+          Email Mark Drah
+        </a>
+        <a href="https://www.linkedin.com/in/markdrah" target="_blank" rel="noopener" class="btn btn-ghost">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.14 1.45-2.14 2.94v5.66H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/></svg>
+          Connect on LinkedIn
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footer-grid">
+    <div class="footer-author">
+      <b>Mark Drah</b>
+      <span class="role">Backend Engineer &amp; Innovator | Cybersecurity Educator</span>
+    </div>
+    <div class="footer-links">
+      <a href="mailto:neutral520@gmail.com">neutral520@gmail.com</a>
+      <a href="https://www.linkedin.com/in/markdrah" target="_blank" rel="noopener">LinkedIn</a>
+      <span style="color:var(--line);">MoMoTag — August 1, 2026</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const sw = document.getElementById('demoSwitch');
+  const header = document.getElementById('phoneHeader');
+  const nameBox = document.getElementById('nameBox');
+  const nameValue = document.getElementById('nameValue');
+  const confirmBtn = document.getElementById('confirmBtn');
+  const fieldLabel = document.getElementById('fieldLabel');
+  const labelToday = document.getElementById('label-today');
+  const labelTag = document.getElementById('label-tag');
+  const caption = document.getElementById('demoCaption');
+  let on = false;
+
+  function render(){
+    [header, nameBox, confirmBtn].forEach(el => el.classList.toggle('on', on));
+    sw.classList.toggle('on', on);
+    labelToday.classList.toggle('active', !on);
+    labelTag.classList.toggle('active', on);
+    fieldLabel.textContent = on ? 'Recipient alias' : 'Recipient name';
+    nameValue.textContent = on ? 'MD-4471' : 'Mark Drah';
+    caption.innerHTML = on
+      ? 'With MoMoTag, the sender confirms using <b>MD-4471</b> — your real name never leaves the system.'
+      : 'A stranger can start (and cancel) this transfer with only your phone number — and walk away with <b>your full legal name</b>.';
+  }
+
+  sw.addEventListener('click', () => { on = !on; render(); });
+  render();
+
+  // Robust in-page smooth scrolling for all anchor links (works even inside sandboxed previews)
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      const targetId = link.getAttribute('href').slice(1);
+      const target = targetId ? document.getElementById(targetId) : null;
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        history.pushState(null, '', '#' + targetId);
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
